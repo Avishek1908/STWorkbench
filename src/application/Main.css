@@ -1,0 +1,5 @@
+/* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+#draglabel {
+	-fx-border-width: 5px;
+	-fx-border-color: #338BFF  ;
+}
