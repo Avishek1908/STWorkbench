@@ -1,12 +1,18 @@
 package application;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 
 import javax.swing.JOptionPane;
+
+import com.sun.glass.ui.Window.Level;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -24,7 +30,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-public class LoginController {
+public class LoginController  {
 	@FXML
 	private ImageView imgview;
 	@FXML
@@ -40,21 +46,17 @@ public class LoginController {
 	private TextField txtfield1;
 	@FXML
 	private TextArea txtarea1;
+	BufferedReader br;
+	String sline2;
+	@FXML
+	private Button butt1;
+	@FXML
+	private Button launcbtn;
 	
 
-/*	@FXML
-	private ListView<String> listview;
-	public void start(Stage primaryStage) {
-		try {
-			
-			primaryStage.show();
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-	}*/
 	
 	public void NewPro(ActionEvent event) throws Exception {
-		
+		Stage stage = (Stage) butt1.getScene().getWindow();
 		Parent root=FXMLLoader.load(getClass().getResource("ProjectInfo.fxml"));
 		Scene scene = new Scene(root,400,400);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
@@ -66,6 +68,7 @@ public class LoginController {
 		primaryStage.setWidth(bounds.getWidth()/2-330);
 		primaryStage.setHeight(bounds.getHeight()/2-165);
 		primaryStage.show();
+		stage.close();
 		
 	}
 	public void Button1Action(ActionEvent event)
@@ -80,16 +83,19 @@ public class LoginController {
 		     txtfield3.setText(selectedDirectory.getAbsolutePath());
 		     
 		     //txtview3.getItems().add(selectedDirectory.getAbsolutePath());
-		     
+		}    
 		}
+
+		    	
+		
+		
 	
-		
-		
-	}
 
 	public void createbutton(ActionEvent event) {
+		Stage stage = (Stage) createbtn.getScene().getWindow();
 	
         try {
+        	
         	String value= txtfield1.getText().toString();
         	String value1= txtfield3.getText().toString();
         	String strDirectory=value;
@@ -102,6 +108,7 @@ public class LoginController {
         	
         	boolean success=( new File(finalpath)).mkdir();
         	if(success)
+
  {
         		System.out.println("Directory:"+strDirectory+" created");
         		
@@ -133,6 +140,11 @@ public class LoginController {
      	    writer2.write("\r\n");
      	    writer2.write(projLoc);
      	    writer2.close();
+     	    
+     	   BufferedWriter writer3 = new BufferedWriter(new FileWriter(stpath+"\\"+"currentpath.txt"));
+      		String projLocx = ""+txtfield3.getText().toString()+"\\"+txtfield1.getText().toString();;
+      		writer3.write(projLocx);
+       	 writer3.close();
         	
      	    
      	   try {
@@ -140,6 +152,7 @@ public class LoginController {
    			Parent root = FXMLLoader.load(getClass().getResource("Main.fxml"));
    			Scene scene = new Scene(root);
    			scene.getStylesheets().add(getClass().getResource("Main.css").toExternalForm());
+   			
    			primaryStage.setScene(scene);
    			Screen screen = Screen.getPrimary();
    			Rectangle2D bounds = screen.getVisualBounds();
@@ -147,6 +160,7 @@ public class LoginController {
    			primaryStage.setY(bounds.getMinY());
    			primaryStage.setWidth(bounds.getWidth()-100);
    			primaryStage.setHeight(bounds.getHeight());
+   			primaryStage.setTitle(value);   			
    			primaryStage.show();
    		} catch(Exception e) {
    			e.printStackTrace();
@@ -160,8 +174,78 @@ public class LoginController {
         catch(Exception e) {
         	System.err.println("Error:"+e.getMessage());
         }
+        stage.close();
 	    
 	}
+	public void ButtonXAction(ActionEvent event) throws IOException
+	{
+		Stage stage = (Stage) launcbtn.getScene().getWindow();
+		
+		 FileChooser fileChooser = new FileChooser();
+	        fileChooser.getExtensionFilters()
+	            .addAll(
+	                new FileChooser.ExtensionFilter("TXT files (*.TXT)", "*.TXT"),
+	                new FileChooser.ExtensionFilter("txt files (*.txt)", "*.txt"));
+	         
+	        File file = fileChooser.showOpenDialog(null);
+	        if (file != null) {
+	            
+	                System.out.println(""+file);
+	                
+	                System.out.println(file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf("\\")+1));
+	                String strLine = "";
+	                
+	                String filepath = file.getAbsolutePath().toString();
+	                String parts = filepath.substring(0, filepath.lastIndexOf("\\"));
+	                System.out.println(parts);
+	                
+	                
+	                String stpath = "C:\\Users\\"+System.getProperty("user.name")+"\\Documents\\STWorkbench";
+	                BufferedWriter writer3 = new BufferedWriter(new FileWriter(stpath+"\\"+"currentpath.txt"));
+	           		String projLocx = parts;
+	           		writer3.write(projLocx);
+	            	writer3.close();
+	                
+	                
+	                try {
+	                    br = new BufferedReader( new FileReader(file));
+	                   // while( (strLine = br.readLine()) != null){
+	                    strLine = br.readLine();
+	                    String sLine=strLine;
+	                    sline2 = sLine.substring(13, sLine.length());
+	                    System.out.println(sline2);
+	                    //}
+	                } catch (FileNotFoundException e) {
+	                    System.err.println("Unable to find the file: fileName");
+	                } catch (IOException e) {
+	                    System.err.println("Unable to read the file: fileName");
+	                }
+	        }
+	        try {
+    			//BorderPane root = new BorderPane();
+    			Parent root = FXMLLoader.load(getClass().getResource("Main.fxml"));
+    			Scene scene = new Scene(root);
+    			scene.getStylesheets().add(getClass().getResource("Main.css").toExternalForm());
+    			primaryStage.setScene(scene);
+    			Screen screen = Screen.getPrimary();
+    			Rectangle2D bounds = screen.getVisualBounds();
+    			primaryStage.setX(bounds.getMinX());
+    			primaryStage.setY(bounds.getMinY());
+    			primaryStage.setWidth(bounds.getWidth()-100);
+    			primaryStage.setHeight(bounds.getHeight());
+    			primaryStage.setTitle(sline2);   			
+    			primaryStage.show();
+    			
+    		} catch(Exception e) {
+    			e.printStackTrace();
+    		}
+	                
+	               
+	        stage.close();   
+	                
+	            
+	        }
+	
+	    };
 	
 	
-}

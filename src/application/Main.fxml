@@ -9,7 +9,6 @@
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
@@ -18,7 +17,7 @@
 
 <AnchorPane fx:id="mainanchorpane" prefHeight="799.0" prefWidth="1888.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainController">
    <children>
-      <MenuBar prefHeight="26.0" prefWidth="1911.0">
+      <MenuBar layoutX="-268.0" prefHeight="26.0" prefWidth="1911.0">
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
@@ -67,36 +66,39 @@
                               <TableView fx:id="tv" editable="true" layoutX="1.0" onDragDetected="#SrsSelect" onDragEntered="#SrsSelect" onMouseDragEntered="#SrsSelect" prefHeight="590.0" prefWidth="1294.0" tableMenuButtonVisible="true" />
                               <HBox fx:id="h_box_spreadsheet" alignment="CENTER" layoutX="-2.0" layoutY="591.0" prefHeight="117.0" prefWidth="1298.0" spacing="30.0">
                                  <children>
-                                    <TextField fx:id="addFirstName" alignment="CENTER" prefHeight="54.0" prefWidth="267.0" promptText="First Name" />
-                                    <TextField fx:id="addLastName" alignment="CENTER" prefHeight="54.0" prefWidth="267.0" promptText="Last Name" />
-                                    <TextField fx:id="addEmail" alignment="CENTER" prefHeight="54.0" prefWidth="267.0" promptText="Email" />
+                                    <TextField fx:id="addFirstName" alignment="CENTER" prefHeight="54.0" prefWidth="267.0" promptText="Parameter" />
+                                    <TextField fx:id="addLastName" alignment="CENTER" prefHeight="54.0" prefWidth="267.0" promptText="Value" />
                                     <Button fx:id="add_row" mnemonicParsing="false" onAction="#AddRows" prefHeight="38.0" prefWidth="119.0" text="Add" />
                                  </children>
                               </HBox>
                            </children>
                         </AnchorPane>
-                        <AnchorPane fx:id="ap_srs" layoutX="313.0" layoutY="-1.0" prefHeight="719.0" prefWidth="1038.0">
+                        <AnchorPane fx:id="ap_srs" layoutX="313.0" layoutY="-1.0" prefHeight="719.0" prefWidth="1295.0">
                            <children>
-                              <TextArea fx:id="txtArea" prefHeight="707.0" prefWidth="1295.0" text="Heyasldkalksdaslkdna&#10;" visible="false" />
+                              <TableView fx:id="tblview" layoutX="2.0" layoutY="2.0" prefHeight="585.0" prefWidth="1294.0" />
                            </children>
                         </AnchorPane>
-                        <VBox layoutX="2.0" layoutY="-1.0" prefHeight="589.0" prefWidth="314.0" spacing="30.0">
+                        <VBox layoutY="-2.0" prefHeight="693.0" prefWidth="316.0" spacing="30.0">
                            <children>
                               <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="37.0" prefWidth="316.0" text="File Properties">
                                  <font>
-                                    <Font size="13.0" />
+                                    <Font name="System Bold" size="21.0" />
                                  </font>
                               </Label>
-                              <Button mnemonicParsing="false" prefHeight="47.0" prefWidth="314.0" text="Import Spreadsheet" />
-                              <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                                 <children>
-                                    <Label fx:id="draglabel" alignment="CENTER" layoutX="4.0" layoutY="-25.0" onDragDropped="#handleDropped" onDragOver="#handleDragOver" prefHeight="251.0" prefWidth="306.0" text="Drag and Drop SpreadSheet" />
-                                 </children>
-                              </AnchorPane>
-                              <Button fx:id="saveSpreadsheet" mnemonicParsing="false" onAction="#exportSheetToXlsx" prefHeight="47.0" prefWidth="314.0" text="Save Spreadsheet">
+                              <Button fx:id="import_spread" mnemonicParsing="false" onAction="#Import_Spreadsheet" prefHeight="47.0" prefWidth="314.0" text="Import Spreadsheet" />
+                              <Button fx:id="saveSpreadsheet" mnemonicParsing="false" onAction="#SaveSpreadSheet" prefHeight="47.0" prefWidth="314.0" text="Save Spreadsheet">
                                  <VBox.margin>
                                     <Insets />
-                                 </VBox.margin></Button>
+                                 </VBox.margin>
+                              </Button>
+                              <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                                 <children>
+                                    <Label fx:id="draglabel" layoutX="1.0" layoutY="-29.0" onDragDropped="#handleDropped" onDragOver="#handleDragOver" prefHeight="266.0" prefWidth="314.0" text="Drag and Drop Spreadsheet to Import" />
+                                 </children>
+                              </AnchorPane>
+                              <Button fx:id="import_req" mnemonicParsing="false" onAction="#Button3Action" prefHeight="26.0" prefWidth="321.0" text="Import requirement fIles" />
+                              <TextField fx:id="txtfield16" prefHeight="146.0" prefWidth="316.0" />
+                              <Button fx:id="launch_srs" mnemonicParsing="false" onAction="#Launch_SRS_Process" prefHeight="42.0" prefWidth="314.0" text="Process Text" />
                            </children>
                         </VBox>
                      </children>
@@ -105,7 +107,21 @@
           </Tab>
           <Tab text="Test Case Generator">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Button fx:id="open_acts" layoutX="372.0" layoutY="165.0" mnemonicParsing="false" onAction="#OpenACTS" text="Button" />
+                        <VBox prefHeight="706.0" prefWidth="318.0">
+                           <children>
+                              <Label alignment="CENTER" prefHeight="54.0" prefWidth="321.0" text="Properties">
+                                 <font>
+                                    <Font name="System Bold" size="23.0" />
+                                 </font>
+                              </Label>
+                              <Button fx:id="import_model" mnemonicParsing="false" onAction="#Import_Model" prefHeight="58.0" prefWidth="319.0" text="Import Model File" />
+                           </children>
+                        </VBox>
+                        <Button layoutX="372.0" layoutY="91.0" mnemonicParsing="false" onAction="#setxml" text="xmlgen" fx:id="xmlgen" />
+                     </children></AnchorPane>
             </content>
           </Tab>
             <Tab text="Prioritize">

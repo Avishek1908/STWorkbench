@@ -10,7 +10,7 @@
 
 <AnchorPane fx:id="butt2" prefHeight="300.0" prefWidth="600.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.LoginController">
    <children>
-      <Button layoutX="309.0" layoutY="187.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="255.0" style="-fx-background-color: black;" text="Open Existing Project" textFill="#31d565">
+      <Button fx:id="launcbtn" layoutX="309.0" layoutY="187.0" mnemonicParsing="false" onAction="#ButtonXAction" prefHeight="26.0" prefWidth="255.0" style="-fx-background-color: black;" text="Open Existing Project" textFill="#31d565">
          <font>
             <Font name="Comic Sans MS" size="19.0" />
          </font></Button>

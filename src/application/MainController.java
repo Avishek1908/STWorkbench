@@ -2,12 +2,20 @@ package application;
 
 import javafx.fxml.FXML;
 
+import java.awt.Desktop;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -26,7 +34,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -40,7 +51,10 @@ import javafx.scene.layout.VBox;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.scene.control.TableColumn.CellEditEvent;
 
@@ -52,95 +66,140 @@ public class MainController {
 	@FXML
 	private TabPane maintabPane;
 	@FXML
-	private TableView<Person> tv = new TableView<Person>();
+	private TableView<SRS> tv = new TableView<SRS>();
 	
 	@FXML
-	private TextField addFirstName, addLastName, addEmail;
+	private TextField addFirstName, addLastName;
 	@FXML
-	private Button add_row;
+	private Button add_row, import_req, import_spread,saveSpreadsheet, launch_srs;
 	@FXML
 	private TextArea txtArea;
 	@FXML
+	private TextField txtfield16 ;
+	@FXML
 	private Label draglabel;
+	@FXML
+	HBox h_box_spreadsheet;
 	
-	ObservableList<Person> data;
+	@FXML
+	private TableView<SRS> tblview = new TableView<SRS>();
+
+	String stpath = "C:\\Users\\"+System.getProperty("user.name")+"\\Documents\\STWorkbench";
+	String curPath;
+	
+	ObservableList<SRS> data;
+	ObservableList<SRS> paramvals;
+	ArrayList<String> Model_List;
 	
 	
-	
-	@FXML public void initialize() {
-		
+	@FXML public void initialize() throws FileNotFoundException {
+
 		 data =
 		        FXCollections.observableArrayList(
-		            new Person("Jacob", "Smith", "jacob.smith@example.com"),
-		            new Person("Isabella", "Johnson", "isabella.johnson@example.com"),
-		            new Person("Ethan", "Williams", "ethan.williams@example.com"),
-		            new Person("Emma", "Jones", "emma.jones@example.com"),
-		            new Person("Michael", "Brown", "michael.brown@example.com")
-		            
 		        );
-		/*for(int i=0;i<=100;i++)
-		{
-			data.add(new Person("","",""));
-		}*/
+		 
+		 paramvals =
+			        FXCollections.observableArrayList(
+			        );
+		 
+		 
+		 BufferedReader br = new BufferedReader(new FileReader(stpath+"//"+"currentpath.txt" ));
+			try {
+				curPath = br.readLine();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		
 		
 		Screen screen = Screen.getPrimary();
 		Rectangle2D bounds = screen.getVisualBounds();
 		
-		
+		tblview.setVisible(false);
 		tv.setEditable(true);
+		
+		SpreadSelect(null);
+		
+		import_req.setVisible(false);
+		txtfield16.setVisible(false);
+		launch_srs.setVisible(false);
 		 
-        TableColumn firstNameCol = new TableColumn("First Name");
+        TableColumn firstNameCol = new TableColumn("Parameters");
         firstNameCol.setMinWidth(100);
         firstNameCol.setCellValueFactory(
-                new PropertyValueFactory<Person, String>("firstName"));
+                new PropertyValueFactory<SRS, String>("Parameters"));
         firstNameCol.setCellFactory(TextFieldTableCell.forTableColumn());
         firstNameCol.setOnEditCommit(
-            new EventHandler<CellEditEvent<Person, String>>() {
+            new EventHandler<CellEditEvent<SRS, String>>() {
                 @Override
-                public void handle(CellEditEvent<Person, String> t) {
-                    ((Person) t.getTableView().getItems().get(
+                public void handle(CellEditEvent<SRS, String> t) {
+                    ((SRS) t.getTableView().getItems().get(
                         t.getTablePosition().getRow())
-                        ).setFirstName(t.getNewValue());
+                        ).setParameters(t.getNewValue());
                 }
             }
         );
- 
-        TableColumn lastNameCol = new TableColumn("Last Name");
+        
+        TableColumn lastNameCol = new TableColumn("Values");
         lastNameCol.setMinWidth(100);
         lastNameCol.setCellValueFactory(
-                new PropertyValueFactory<Person, String>("lastName"));
+                new PropertyValueFactory<SRS, String>("Values"));
         lastNameCol.setCellFactory(TextFieldTableCell.forTableColumn());
         lastNameCol.setOnEditCommit(
-            new EventHandler<CellEditEvent<Person, String>>() {
+            new EventHandler<CellEditEvent<SRS, String>>() {
                 @Override
-                public void handle(CellEditEvent<Person, String> t) {
-                    ((Person) t.getTableView().getItems().get(
+                public void handle(CellEditEvent<SRS, String> t) {
+                    ((SRS) t.getTableView().getItems().get(
                         t.getTablePosition().getRow())
-                        ).setLastName(t.getNewValue());
+                        ).setValues(t.getNewValue());
                 }
             }
         );
  
-        TableColumn emailCol = new TableColumn("Email");
-        emailCol.setMinWidth(200);
-        emailCol.setCellValueFactory(
-                new PropertyValueFactory<Person, String>("email"));
-        emailCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        emailCol.setOnEditCommit(
-            new EventHandler<CellEditEvent<Person, String>>() {
-                @Override
-                public void handle(CellEditEvent<Person, String> t) {
-                    ((Person) t.getTableView().getItems().get(
-                        t.getTablePosition().getRow())
-                        ).setEmail(t.getNewValue());
-                }
-            }
-        );
+        
  
         tv.setItems(data);
-        tv.getColumns().addAll(firstNameCol, lastNameCol, emailCol);
+        tv.getColumns().addAll(firstNameCol, lastNameCol);
 		
-		ap_srs.setVisible(false);
+       //---------------------------------tblview-------------------------
+        
+        TableColumn paramCol = new TableColumn("Parameters");
+        paramCol.setMinWidth(100);
+        paramCol.setCellValueFactory(
+                new PropertyValueFactory<SRS, String>("Parameters"));
+        paramCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        paramCol.setOnEditCommit(
+            new EventHandler<CellEditEvent<SRS, String>>() {
+                @Override
+                public void handle(CellEditEvent<SRS, String> t) {
+                    ((SRS) t.getTableView().getItems().get(
+                        t.getTablePosition().getRow())
+                        ).setParameters(t.getNewValue());
+                }
+            }
+        );
+ 
+        TableColumn valuesCol = new TableColumn("Values");
+        valuesCol.setMinWidth(100);
+        valuesCol.setCellValueFactory(
+                new PropertyValueFactory<SRS, String>("Values"));
+        valuesCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        valuesCol.setOnEditCommit(
+            new EventHandler<CellEditEvent<SRS, String>>() {
+                @Override
+                public void handle(CellEditEvent<SRS, String> t) {
+                    ((SRS) t.getTableView().getItems().get(
+                        t.getTablePosition().getRow())
+                        ).setValues(t.getNewValue());
+                }
+            }
+        );
+ 
+ 
+        tblview.setItems(paramvals);
+        tblview.getColumns().addAll(paramCol, valuesCol);
+        
+		
 		
 		mainanchorpane.setMaxHeight(bounds.getHeight());
 		mainanchorpane.setMinHeight(bounds.getHeight());
@@ -158,14 +217,116 @@ public class MainController {
 	
 	public void AddRows(ActionEvent e)
 	{
-		data.add(new Person(
+		
+		
+		data.add(new SRS(
 	            addFirstName.getText(),
-	            addLastName.getText(),
-	            addEmail.getText()
+	            addLastName.getText()
 	        ));
 	        addFirstName.clear();
 	        addLastName.clear();
-	        addEmail.clear();
+	}
+	public void Button3Action(ActionEvent event)
+	{
+		//DirectoryChooser dc = new DirectoryChooser();
+		//File selectedDirectory = dc.showDialog(null);
+		
+		
+		   FileChooser fileChooser = new FileChooser();
+		     File selectedFile = fileChooser.showOpenDialog(null);
+
+		if(selectedFile == null){
+		     //No Directory selected
+		}else{
+		
+			        try {
+			            FileReader reader = new FileReader(selectedFile);
+			            int character;
+			            String content ="";
+			            
+			            while ((character = reader.read()) != -1) 
+		            	{
+			            	content=content+((char) character);
+			                //System.out.println((char) character);
+		                }
+			            
+			            PrintWriter writer = new PrintWriter("C:\\Users\\bharg\\Documents\\STWorkbench\\sampleInput.txt", "UTF-8");
+			            writer.println(content);
+			            writer.close();
+			            
+			            String pythonScriptPath = "C:\\Users\\bharg\\Documents\\STWorkbench\\SRS.py";
+			    		String[] cmd = new String[2];
+			    		cmd[0] = "python"; // check version of installed python: python -V
+			    		cmd[1] = pythonScriptPath;
+			    		 
+			    		// create runtime to execute external command
+			    		Runtime rt = Runtime.getRuntime();
+			    		Process pr = rt.exec(cmd);
+			    		
+			    		String finalString = "";
+			    		// retrieve output from python script
+			    		BufferedReader bfr = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+			    		String line = "";
+			    		while((line = bfr.readLine()) != null) {
+			    		// display each output line form python script
+			    			finalString = finalString + line;
+			    		//System.out.println(line);
+			    		}
+			    		
+		    		System.out.println(finalString);
+			    		//PythonInterpreter interpreter = new PythonInterpreter();
+			    		String content1 = "";
+			    		try (BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\bharg\\Documents\\STWorkbench\\testfile.txt"))) {
+			    			
+			    			String sCurrentLine;
+
+			    			while ((sCurrentLine = br.readLine()) != null) {
+			    				content1 = content1 + sCurrentLine;
+			    			}
+
+			    		} catch (IOException e) {
+			    			e.printStackTrace();
+			    		}
+			            
+			            String[] params = new String[100];
+			            String[] vals = new String[100];
+			            
+			            String[] temp = finalString.split(" ");
+			            for(String hey : temp){
+			                String temp1[] = hey.split("=");
+			                //System.out.println(temp1.length);
+			                if(temp1.length == 2)
+			                {
+			                	paramvals.add(new SRS(
+			    			            temp1[0],
+			    			            temp1[1]
+			    			        ));
+			                }
+			            }
+			            
+			            
+				        
+			            draglabel.setText(content);
+			            reader.close();
+			 
+			        } catch (IOException e) {
+			            e.printStackTrace();
+			        }
+			    
+		  
+		     
+		     //txtview3.getItems().add(selectedDirectory.getAbsolutePath());
+		     
+		}
+	
+		
+		
+	}
+	
+	public void OpenACTS(ActionEvent e) throws IOException
+	{
+		File file = new File("E:\\Bhargav\\Projects\\STWorkbench\\Preethi Mam Files\\SampleInput\\FireEye\\acts_beta_v1_r9.3\\release9.3\\acts_gui_beta_v1_r9.3.jar");
+		Desktop.getDesktop().open(file);
 	}
 	
 	public void handleDragOver(DragEvent e)
@@ -182,9 +343,10 @@ public class MainController {
 		List<File> files = e.getDragboard().getFiles();
 		String str = files.get(0).getName().toString();
 		
+		
+		
 		if(str.endsWith("xlsx"))
 		{
-			data.clear();
 			String[] sheetrows ;
 			//File f = files.get(0);
 			draglabel.setText(files.get(0).getName().toString());
@@ -230,13 +392,12 @@ public class MainController {
 					i=i+1;
 				}
 				
-				data.add(new Person(
+				data.add(new SRS(
 			            sheetrows[0],
-			            sheetrows[1],
-			            sheetrows[2]
+			            sheetrows[1]
 			        ));
 				
-				System.out.println();
+				System.out.println(sheetrows[0] + "blahh"+sheetrows[1]);
 			}
 			
 		}
@@ -247,13 +408,32 @@ public class MainController {
 		}
 	}
 	
-	public void exportSheetToXlsx(ActionEvent e) throws IOException
+	public void SaveSpreadSheet(ActionEvent e) throws IOException
+	{
+		if(tv.isVisible())
+		{
+			exportSheetToXlsx();
+		}
+		else if(tblview.isVisible())
+		{
+			SaveSRSSpread();
+		}
+		else
+		{
+			
+		}
+	}
+	
+	public void exportSheetToXlsx() throws IOException
 	{
 		
-		Workbook workbook = new HSSFWorkbook();
+		Workbook workbook = new XSSFWorkbook();
         Sheet spreadsheet = workbook.createSheet("sample");
-
+        
+        
         Row row = spreadsheet.createRow(0);
+        
+        
 
         for (int j = 0; j < tv.getColumns().size(); j++) {
             row.createCell(j).setCellValue(tv.getColumns().get(j).getText());
@@ -271,66 +451,422 @@ public class MainController {
             }
         }
         
-        DirectoryChooser dc = new DirectoryChooser();
-        File selectedDir = dc.showDialog(null);
-        if(selectedDir==null)
-        {
         
-        }
-        else
-        {
-        FileOutputStream fileOut = new FileOutputStream(selectedDir.getAbsolutePath()+"\\workbook.xls");
+        FileOutputStream fileOut = new FileOutputStream(curPath+"\\modelSave.xlsx");
         workbook.write(fileOut);
         fileOut.close();
-        }
+        
+        Alert alert = new Alert(AlertType.INFORMATION, "Saved the Model File to Project Location", ButtonType.OK);
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+        alert.show();
+        
 	}
+	
 	public void SrsSelect(ActionEvent e)
 	{
 		ap_srs.setVisible(true);
-		txtArea.setVisible(true);
+		tblview.setVisible(true);
+		tv.setVisible(false);
+		import_req.setVisible(true);
+		txtfield16.setVisible(true);
+		import_spread.setVisible(false);
+		saveSpreadsheet.setVisible(true);
+		launch_srs.setVisible(true);
+		h_box_spreadsheet.setVisible(false);
+		
 	}
 	
 	public void SpreadSelect(ActionEvent e)
 	{
 		ap_srs.setVisible(false);
-		txtArea.setVisible(false);
+		tblview.setVisible(false);
+		tv.setVisible(true);
+		import_req.setVisible(false);
+		txtfield16.setVisible(false);
+		import_spread.setVisible(true);
+		saveSpreadsheet.setVisible(true);
+		launch_srs.setVisible(false);
+		h_box_spreadsheet.setVisible(true);
 	}
 	
+	public void Launch_SRS_Process(ActionEvent e)
+
+	{
+		String content = txtfield16.getText().toString();
+		
+		try {
+            
+            PrintWriter writer = new PrintWriter("C:\\Users\\bharg\\Documents\\STWorkbench\\sampleInput.txt", "UTF-8");
+            writer.println(content);
+            writer.close();
+            
+            String pythonScriptPath = "C:\\Users\\bharg\\Documents\\STWorkbench\\SRS.py";
+    		String[] cmd = new String[2];
+    		cmd[0] = "python"; // check version of installed python: python -V
+    		cmd[1] = pythonScriptPath;
+    		 
+    		// create runtime to execute external command
+    		Runtime rt = Runtime.getRuntime();
+    		Process pr = rt.exec(cmd);
+    		
+    		String finalString = "";
+    		// retrieve output from python script
+    		BufferedReader bfr = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+    		String line = "";
+    		while((line = bfr.readLine()) != null) {
+    		// display each output line form python script
+    			finalString = finalString + line;
+    		//System.out.println(line);
+    		}
+    		
+		System.out.println(finalString);
+    		//PythonInterpreter interpreter = new PythonInterpreter();
+    		String content1 = "";
+    		try (BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\bharg\\Documents\\STWorkbench\\testfile.txt"))) {
+    			
+    			String sCurrentLine;
+
+    			while ((sCurrentLine = br.readLine()) != null) {
+    				content1 = content1 + sCurrentLine;
+    			}
+
+    		} catch (IOException err) {
+    			err.printStackTrace();
+    		}
+            
+            String[] params = new String[100];
+            String[] vals = new String[100];
+            
+            String[] temp = finalString.split(" ");
+            for(String hey : temp){
+                String temp1[] = hey.split("=");
+                //System.out.println(temp1.length);
+                if(temp1.length == 2)
+                {
+                	paramvals.add(new SRS(
+    			            temp1[0],
+    			            temp1[1]
+    			        ));
+                }
+            }
+            
+            
+	        
+            draglabel.setText(content);
+ 
+        } catch (IOException err) {
+            err.printStackTrace();
+        }
+    
+
+ 
+ //txtview3.getItems().add(selectedDirectory.getAbsolutePath());
+ 
+
+	}
 	
-	public static class Person {
+	public void Import_Spreadsheet(ActionEvent e) throws IOException
+	{
+		
+		FileChooser fileChooser = new FileChooser();
+		File file = fileChooser.showOpenDialog(null);
+		
+		String str = file.getAbsolutePath().toString();
+		if(str.endsWith("xlsx"))
+		{
+			String[] sheetrows ;
+			//File f = files.get(0);
+			draglabel.setText(file.getName().toString());
+			//InputStream f = new FileInputStream("LocalHackday.xlsx");
+			InputStream ExcelFileToRead = new FileInputStream(str);
+			XSSFWorkbook  wb = new XSSFWorkbook(ExcelFileToRead);
+			
+			XSSFWorkbook test = new XSSFWorkbook(); 
+			
+			XSSFSheet sheet = wb.getSheetAt(0);
+			XSSFRow row; 
+			XSSFCell cell;
+
+			Iterator rows = sheet.rowIterator();
+
+			while (rows.hasNext())
+			{
+				row=(XSSFRow) rows.next();
+				
+				sheetrows = new String[3];
+				int i =0;
+				
+				Iterator cells = row.cellIterator();
+				while (cells.hasNext())
+				{
+					
+					cell=(XSSFCell) cells.next();
+			
+					if (cell.getCellType() == CellType.STRING)
+					{
+						sheetrows[i] = cell.getStringCellValue();
+						System.out.print(cell.getStringCellValue()+" ");
+					}
+					else if(cell.getCellType() == CellType.NUMERIC)
+					{
+						sheetrows[i] = cell.getStringCellValue();
+						System.out.print(cell.getNumericCellValue()+" ");
+					}
+					else
+					{
+						//U Can Handel Boolean, Formula, Errors
+					}
+					i=i+1;
+				}
+				
+				data.add(new SRS(
+			            sheetrows[0],
+			            sheetrows[1]
+			        ));
+				
+				
+				System.out.println(sheetrows[0] + "blahh"+sheetrows[1]);
+			}
+			
+		}
+		
+		else
+		{
+			draglabel.setText("Please enter a valid Excel File");
+		}
+	}
+	
+	public void Import_Model(ActionEvent e) throws IOException
+
+	{
+		FileChooser fileChooser = new FileChooser();
+		File file = fileChooser.showOpenDialog(null);
+		
+		String str = file.getAbsolutePath().toString();
+		
+		Model_List =new ArrayList<String>();
+		
+		if(str.endsWith("xlsx"))
+		{
+			String[] sheetrows ;
+			//File f = files.get(0);
+			draglabel.setText(file.getName().toString());
+			//InputStream f = new FileInputStream("LocalHackday.xlsx");
+			InputStream ExcelFileToRead = new FileInputStream(str);
+			XSSFWorkbook  wb = new XSSFWorkbook(ExcelFileToRead);
+			
+			XSSFWorkbook test = new XSSFWorkbook(); 
+			
+			XSSFSheet sheet = wb.getSheetAt(0);
+			XSSFRow row; 
+			XSSFCell cell;
+
+			Iterator rows = sheet.rowIterator();
+
+			while (rows.hasNext())
+			{
+				row=(XSSFRow) rows.next();
+				
+				sheetrows = new String[3];
+				int i =0;
+				
+				Iterator cells = row.cellIterator();
+				while (cells.hasNext())
+				{
+					
+					cell=(XSSFCell) cells.next();
+			
+					if (cell.getCellType() == CellType.STRING)
+					{
+						sheetrows[i] = cell.getStringCellValue();
+						System.out.print(cell.getStringCellValue()+" ");
+					}
+					else if(cell.getCellType() == CellType.NUMERIC)
+					{
+						sheetrows[i] = cell.getStringCellValue();
+						System.out.print(cell.getNumericCellValue()+" ");
+					}
+					else
+					{
+						//U Can Handel Boolean, Formula, Errors
+					}
+					
+					i=i+1;
+				}
+				
+				Model_List.add(sheetrows[0]);
+				
+				
+				System.out.println(sheetrows[0] + "blahh"+sheetrows[1]);
+			}
+			System.out.println(Model_List);
+		}
+		
+		else
+		{
+			draglabel.setText("Please enter a valid Excel File");
+		}
+	}
+
+	public void setxml(ActionEvent e) throws IOException
+	{
+		
+		
+		String stpath = "C:\\Users\\"+System.getProperty("user.name")+"\\Documents\\STWorkbench";
 		 
-        private final SimpleStringProperty firstName;
-        private final SimpleStringProperty lastName;
-        private final SimpleStringProperty email;
+	        System.out.println(curPath);
+	        System.out.println(curPath.substring(curPath.lastIndexOf("\\")+1));
+	        String Slinex=curPath.substring(curPath.lastIndexOf("\\")+1);
+	        
+	        BufferedWriter writer4 = new BufferedWriter(new FileWriter(curPath+"\\"+"index.xml"));
+       		
+	        
+	        writer4.write ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+	        writer4.write("\r\n");
+	        
+	        writer4.write ("<System name=\""+Slinex+"\">");
+	        writer4.write("\r\n");
+	        writer4.write(" <Parameters>");
+	        writer4.write("\r\n");
+	        String[] myStrings = { "Bhargav", "Avishek", "Likhith", "Itisha", "Akash", "Aneesh", "Preethi", "Krishnan", "Aneesh", "Panda"  };
+	        for(int id = 0; id< Model_List.size(); id++) {
+	        	String xXx="<Parameter id=\""+id+"\" name=\""+Model_List.get(id)+"\" type=\"2\"> ";
+	        	writer4.write(xXx);
+	        	writer4.write("\r\n");
+	        	//writer4.write("\r\n");
+	        	//writer4.write("\r\n");
+	            writer4.write("<values>");
+	            writer4.write("\r\n");
+	           // writer4.write("\r\n");
+	            writer4.write("  <value>true</value>");
+	            writer4.write("\r\n");
+	            writer4.write("  <value>false</value>");
+	            writer4.write("\r\n");
+	          //  writer4.write("\r\n");
+	            writer4.write("</values>");
+	            writer4.write("\r\n");
+	         //   writer4.write("\r\n");
+	            writer4.write("<basechoices>");
+	            writer4.write("\r\n");
+	           // writer4.write("\r\n");
+	            writer4.write("  <basechoice>true</basechoice>");
+	            writer4.write("\r\n");
+	            writer4.write("  <basechoice>false</basechoice>");
+	            writer4.write("\r\n");
+	          //  writer4.write("\r\n");
+	            writer4.write("</basechoices>");
+	            writer4.write("\r\n");
+	            //writer4.write("\r\n");
+	            writer4.write("</Parameter>");
+	            writer4.write("\r\n");
+	            
+	            
+	            
+	        }
+	        
+	        
+	        
+	     
+	        
+	        writer4.write("</Parameters>");
+	        writer4.write("\r\n");
+
+	        writer4.write("<OutputParameters />");
+	        writer4.write("\r\n");
+	        writer4.write("<Relations>");
+	        String xHx="<Relation Strength=\""+Model_List.size()+"\" Default=\"true\">";
+	        
+        	writer4.write(xHx);
+        	 writer4.write("\r\n");
+	        for(int id = 0; id< Model_List.size(); id++)
+	        {
+	        	
+	        	String xGx= "<Parameter name=\"" +Model_List.get(id)+"\">";
+	        	writer4.write(xGx);
+	        	writer4.write("\r\n");
+	            writer4.write("  <value>true</value>");
+	            writer4.write("\r\n");
+	            writer4.write("  <value>false</value>");
+	            writer4.write("\r\n");
+	            writer4.write("</Parameter>");
+	            writer4.write("\r\n");
+	           }
+	        writer4.write("</Relation>");
+	        writer4.write("\r\n");
+	        writer4.write("</Relations>");
+	        writer4.write("\r\n");
+	        writer4.write("<Constraints />");
+	        writer4.write("\r\n");
+	        writer4.write("</System>");
+	        writer4.write("\r\n");
+	        
+	        
+       		//writer4.write(ssline1);
+        	writer4.close();
+       	
+		
+	}
+	
+	public void SaveSRSSpread() throws IOException
+	{
+		Workbook workbook = new XSSFWorkbook();
+        Sheet spreadsheet = workbook.createSheet("sample");
+        
+        
+        Row row = spreadsheet.createRow(0);
+        
+        
+
+        for (int j = 0; j < tblview.getColumns().size(); j++) {
+            row.createCell(j).setCellValue(tblview.getColumns().get(j).getText());
+        }
+
+        for (int i = 0; i < tblview.getItems().size(); i++) {
+            row = spreadsheet.createRow(i + 1);
+            for (int j = 0; j < tblview.getColumns().size(); j++) {
+                if(tblview.getColumns().get(j).getCellData(i) != null) { 
+                    row.createCell(j).setCellValue(tblview.getColumns().get(j).getCellData(i).toString()); 
+                }
+                else {
+                    row.createCell(j).setCellValue("");
+                }   
+            }
+        }
+        
+        
+        FileOutputStream fileOut = new FileOutputStream(curPath+"\\SRSSave.xlsx");
+        workbook.write(fileOut);
+        fileOut.close();
+        
+        Alert alert = new Alert(AlertType.INFORMATION, "Saved the SRS File to Project Location", ButtonType.OK);
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+        alert.show();
+	}
+	
+	public static class SRS {
+		 
+        private final SimpleStringProperty parameters;
+        private final SimpleStringProperty values;
  
-        private Person(String fName, String lName, String email) {
-            this.firstName = new SimpleStringProperty(fName);
-            this.lastName = new SimpleStringProperty(lName);
-            this.email = new SimpleStringProperty(email);
+        private SRS(String param, String val) {
+            this.parameters = new SimpleStringProperty(param);
+            this.values = new SimpleStringProperty(val);
         }
  
-        public String getFirstName() {
-            return firstName.get();
+        public String getParameters() {
+            return parameters.get();
         }
  
-        public void setFirstName(String fName) {
-            firstName.set(fName);
+        public void setParameters(String fName) {
+        	parameters.set(fName);
         }
  
-        public String getLastName() {
-            return lastName.get();
+        public String getValues() {
+            return values.get();
         }
  
-        public void setLastName(String fName) {
-            lastName.set(fName);
-        }
- 
-        public String getEmail() {
-            return email.get();
-        }
- 
-        public void setEmail(String fName) {
-            email.set(fName);
+        public void setValues(String fName) {
+        	values.set(fName);
         }
     }
 	
